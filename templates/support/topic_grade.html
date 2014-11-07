@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{% static 'support/css/forum.css' %}">
+{% endblock %}
+{% block content %}
+
+<h1>{{topic_grade.grade.name}} {{topic_grade.topic.name}}</h1>
+<p>{{topic_grade.intro_text}}</p>
+
+{% include "support/forum.html" with page='support:topic_grade' object=topic_grade  questions=topic_grade.forum.sorted_questions %}
+
+<ul class="lessons">
+    {% for lessonTopic in topic_grade.lessontopic_set.all %}
+    <li>
+        <a href="{% url 'support:lesson' lessonTopic.lesson.id %}">{{lessonTopic.lesson.name}}</a> 
+        <p>{{lessonTopic.intro_text}}</p>
+
+        {% include "support/forum.html" with page='support:topic_grade' object=lessonTopic  questions=lessonTopic.forum.sorted_questions %}
+    </li>
+    {% endfor %}
+</ul>
+
+
+
+
+{% endblock %}

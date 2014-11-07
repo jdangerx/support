@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{topic.name}}</h1>
+<p>{{topic.intro_text}}</p>
+
+<ul>
+    {% for topicgrade in topic.topicgrade_set.all %}
+    <li><a href="{% url 'support:topic_grade' topicgrade.id %}">{{topicgrade.grade.name}}</a></li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

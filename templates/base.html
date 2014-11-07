@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+{% load staticfiles %}
+<head>
+    <title>Heritage Chinese Center - Teacher Support</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'support/css/base.css' %}">
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    {% block style %}{% endblock %}
+</head>
+
+<body>
+    <header>
+        <span>
+        {% if user.is_authenticated %}
+            Hello, {{user.username}} <a href="{% url 'support:logout' %}">Log out</a>
+        {% else %}
+            <a href="{% url 'support:login' %}">Log in</a> or
+            <a href="{% url 'support:sign_up' %}">Sign up</a>
+        {% endif%}
+        </span>
+        <a href="">order</a>
+        <a href="">homework</a>
+        <a href="{% url 'support:index' %}">support</a>
+        <h1>Heritage Chinese Center Teacher Support</h1>
+    </header>
+    <main>
+	   {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

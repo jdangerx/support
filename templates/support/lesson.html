@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{% static 'support/css/forum.css' %}">
+{% endblock %}
+{% block content %}
+
+<h1>{{lesson.name}}</h1>
+<p>{{lesson.intro_text}}</p>
+{% for lessonTopic in lesson.lessontopic_set.all %}
+<p>{{lessonTopic.intro_text }}</p>
+{% endfor %}
+<p>
+	<h2>Supplemental Materials</h2>
+	<ul>{% for material in lesson.supplementalmaterial_set.all %}
+		<li>
+			<a href="{{material.material_file.url}}">{{material.name}}</a> 
+			- by {{material.author.username}}
+		</li>
+		{% endfor %}
+	</ul>
+	{% if user_is_moderator %}
+	<a href="{% url 'support:upload_supplemental_material' lesson.id %}">Upload Supplemental Materials</a>
+	{% endif %}
+</p>
+
+{% include "support/forum.html" with page='support:lesson' object=lesson  questions=lesson.sorted_questions %}
+
+{% endblock %}

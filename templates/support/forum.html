@@ -1,0 +1,68 @@
+{% if error_message %}<p><strong>{{error_message}}</strong></p>{% endif %}
+<h2>Questions about {{object.name}}</h2>
+<ul>
+    {% for question in questions %}
+    <li>
+        <div>
+            {% if user.is_authenticated %}
+            <a href="{% url 'support:up_vote_question' question.id %}?next={% url page object.id %}">&#x25B2;</a>
+            {% endif %}
+            <span>{{question.vote_count}} vote{{ question.vote_count|pluralize }}</span>
+            {% if user.is_authenticated %}
+            <a href="{% url 'support:down_vote_question' question.id %}?next={% url page object.id %}">&#x25BC;</a>
+            {% endif %}
+        </div>
+        <p>{{question.question_text}}
+            <span>asked by {{question.author.username}}</span>
+        </p>
+        <h3>{{question.answer_set.all.count}} Answer{{question.answer_set.all.count|pluralize}} </h3>
+        <ul>
+            {% for answer in question.sorted_answers %}
+            <li>
+                <div>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'support:up_vote_answer' answer.id %}?next={% url page object.id %}">&#x25B2;</a>
+                    {% endif %}
+                    <span>{{answer.vote_count}} vote{{ answer.vote_count|pluralize }}</span>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'support:down_vote_answer' answer.id %}?next={% url page object.id %}">&#x25BC;</a>
+                    {% endif %}
+                </div>
+                <p>{{answer.answer_text}}
+                    <span>answered by {{answer.author.username}}</span>
+                </p>
+            </li>
+            {% endfor %}
+        </ul>
+        {% if user.is_authenticated %}
+        <form action="{% url 'support:answer' %}?next={% url page object.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="question" value="{{question.id}}"/>
+            <label for="id_answer">your answer:</label>
+            <textarea name="answer" id="id_answer"></textarea>
+            <input type="submit" value="Submit"/>
+        </form> 
+        {% else %}
+            <a href="{% url 'support:login' %}?next={% url page object.id %}">Log in</a> or
+            <a href="{% url 'support:sign_up' %}?next={% url page object.id %}">Sign up</a> to answer this question
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% if user.is_authenticated %}
+    <form action="{% url 'support:ask' %}?next={% url page object.id %}" method="post">
+    {% csrf_token %}
+        <label for="id_forum"> Is this a question about:</label>
+        <select id="id_forum" name="forum">
+            <option value="{{object.forum.id}}">{{object.name}} in general</option>
+            {% for lessonTopic in object.lessontopic_set.all %}
+            <option value="{{lessonTopic.forum.id}}">{{lessonTopic.lesson.name}} {{lessonTopic.topic.topic.name}}</option>
+            {% endfor %}
+        </select>
+        <label for="id_question">your question:</label><textarea id="id_question" name="question"></textarea>
+        <input type="submit" value="Ask"/>
+    </form> 
+{% else %}
+    <a href="{% url 'support:login' %}?next={% url page object.id %}">Log in</a> or
+    <a href="{% url 'support:sign_up' %}?next={% url page object.id %}">Sign up</a> to ask a question
+{% endif%}

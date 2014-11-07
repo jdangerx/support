@@ -1,0 +1,45 @@
+
+ul {
+    list-style-type: none;
+    padding:1% 1.6% 1% 0;
+    zoom:1; /* For IE 6/7 */
+}
+
+ul:before,
+ul:after {
+    content:"";
+    display:table;
+}
+ul:after {
+    clear:both;
+}
+
+ul li {
+    display: block;
+    float:left;
+    margin: 1% 0 1% 1.6%;
+    width: 31.5%;
+
+}
+
+ul li ul li, ul li ul li:first-child {
+    float:none;
+    width:100%;
+    margin: 2% 0 2% 1.6%;
+}
+li a {
+    display:block;
+    background-color: #fbfbfb;
+    padding:5%;
+    border-radius: .5em;
+}
+li a:hover{
+    background-color: #fff;
+}
+
+@media only screen and (max-width: 480px) {
+    ul li { 
+        margin: 1% 0 1% 0%;
+        width: 100%;
+    }
+}

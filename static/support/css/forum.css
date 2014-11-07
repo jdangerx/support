@@ -1,0 +1,42 @@
+ul {
+    padding-left:0px;
+}
+ul ul, ul.lessons ul ul{
+    padding-left:13%;
+}
+ul.lessons ul{
+    padding-left:0%;
+}
+ul li {
+    display:block;
+    list-style-type: none;
+    background-color: #fafafa;
+    clear:left;
+    padding:1%;
+    margin:2% 0;
+}
+ul li div {
+    width:13%;
+    float:left;
+}
+ul li div a{
+    display:block;
+    text-decoration: none;
+}
+ul li div span{
+    font-size: 1em;
+}
+ul li ul li {
+    background-color:#fff;
+}
+
+ul li p span {
+    color:#333;
+    font-style: italic;
+}
+
+@media only screen and (max-width: 480px) {
+    ul li div span{
+        font-size: .6em;
+    }
+}
