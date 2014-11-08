@@ -9,7 +9,11 @@ admin.site.register(Answer)
 admin.site.register(Topic)
 admin.site.register(Vote)
 
-@admin.register(Lesson)
+admin.site.register(Lesson)
+admin.site.register(TopicGrade)
+admin.site.register(LessonTopic)
+
+#@admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
     exclude = ('forum',)
     list_display = ('__str__', 'forum')
@@ -21,7 +25,7 @@ class LessonAdmin(admin.ModelAdmin):
             obj.forum = forum
         obj.save()
 
-@admin.register(TopicGrade)
+#@admin.register(TopicGrade)
 class TopicGradeAdmin(admin.ModelAdmin):
     exclude = ('forum',)
     list_display = ('__str__', 'forum')
@@ -33,7 +37,7 @@ class TopicGradeAdmin(admin.ModelAdmin):
             obj.forum = forum
         obj.save()
 
-@admin.register(LessonTopic)
+#@admin.register(LessonTopic)
 class LessonTopicAdmin(admin.ModelAdmin):
     exclude = ('forum',)
     list_display = ('__str__', 'forum')

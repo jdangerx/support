@@ -3,7 +3,7 @@ from django.db.models import Sum
 
 from django.contrib.auth.models import User
 
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.generic import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 
 class Vote(models.Model):
@@ -127,7 +127,7 @@ class TopicGrade(models.Model):
 
 class SupplementalMaterial(models.Model):
 	name = models.CharField(max_length=200)
-	material_file = models.FileField()
+	material_file = models.FileField(upload_to='support/')
 	lesson = models.ForeignKey(Lesson)
 	author = models.ForeignKey(User)
 	order = models.IntegerField(default=0)
