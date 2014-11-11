@@ -2,14 +2,26 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.http import is_safe_url
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
+from django.db.models import Count, Q
 
 from support.models import Grade, Topic, Lesson, Question, Answer, SupplementalMaterial, TopicGrade, Forum
 from support.forms import SignUpForm, SupplementalMaterialForm
 
+def user_votes(user):
+	votes = 0
+	for question in user.question_set.all():
+		votes += question.vote_count()
+	for answer in user.answer_set.all():
+		votes += answer.vote_count()
+	return votes
+
 def index(request):
 	all_grades = Grade.objects.all()
 	all_topics = Topic.objects.all()
-	context = {'all_grades': all_grades, 'all_topics': all_topics}
+	all_users = User.objects.annotate(Count('question')).annotate(Count('answer')).filter(Q(question__count__gt=0) | Q( answer__count__gt=0))
+	all_users = sorted(all_users, key=lambda user: user_votes(user), reverse=True)
+	context = {'all_grades': all_grades, 'all_topics': all_topics, 'all_users': all_users}
 	return render(request, 'support/index.html', context)
 
 def grade(request, grade_id):
@@ -138,6 +150,10 @@ def sign_up(request):
 		form = SignUpForm()
 
 	return render(request, 'support/sign_up.html', {'form': form})
+
+def user(request, user_id):
+	user = get_object_or_404(User, pk=user_id)
+	return render(request, 'support/user.html', {'user': user})
 
 def upload_supplemental_material(request, lesson_id):
 	lesson = get_object_or_404(Lesson, pk=lesson_id)

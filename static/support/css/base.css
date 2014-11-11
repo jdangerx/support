@@ -2,10 +2,10 @@ body {
     font: 15px Helvetica, Arial, sans-serif;
     margin:0px;
 
-    background-color: #ccc;
+    background-color: #def4fa;
 }
 header {
-    background-color: #ddd;  
+    background-color: #05a9d3;  
 }
 header>a{
     display:block;
@@ -19,12 +19,18 @@ header>a{
     text-align: center;
 
 }
+a {
+    color:#0969BF;
+    text-decoration: none;
+}
+a:visited{
+    color:#0969BF;
+}
 main {
     width:90%;
     max-width: 850px;
     margin:5px auto;
     text-align: left;
-    background-color: #efefef;
     padding:10px;
 }
 header h1{
@@ -32,16 +38,22 @@ header h1{
     clear:both;
     padding:20px;
     font-size: 1.7em;
+    color:#fff;
+    background:transparent;
 }
 h1, h2, h3 {
     margin:.5em 0;
+    padding-left:2px;
+    color:#003D4B;
+    background: linear-gradient(to right, rgba(153,220,237,1) 0%,rgba(222,244,250,0) 25%,rgba(199,243,253,0) 100%);
+    border-radius: 2px;
 }
 header span {
     float:right;
     padding:5px;
 }
 main p {
-    padding:0 10px;
+    
 }
 
 @media only screen and (max-width: 480px) {
@@ -68,6 +80,7 @@ input[type=text],input[type=password],input[type=email] {
     margin:1%;
     border-radius: 10px;
     border-width: 1px;
+    border-color:#ccc;
 }
 
 select {
@@ -75,6 +88,7 @@ select {
     float:left;
     width:50%;
     margin:2% 1%;
+    height:2em;
 }
 
 textarea {
@@ -85,6 +99,8 @@ textarea {
     margin:1%;
     border-radius: 10px;
     border-width: 1px;
+    font-size: 1em;
+    border-color:#ccc;
 }
 input[type=submit]{
     display:block;
@@ -92,6 +108,7 @@ input[type=submit]{
     margin:2%;
     margin-left:27%;
     width:25%;
+    cursor:pointer;
 }
 
 

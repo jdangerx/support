@@ -6,6 +6,9 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.generic import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 
+import markdown
+import bleach
+
 class Vote(models.Model):
 	user = models.ForeignKey(User)
 	value = models.IntegerField(default=0)
@@ -109,6 +112,9 @@ class Question(Votable):
 	def __str__(self):
 		return self.question_text
 
+	def question_html(self):
+		return markdown.markdown(bleach.clean(self.question_text))
+
 	def sorted_answers(self):
 		return sorted(self.answer_set.all(), key=lambda x: x.vote_count(), reverse=True)
 
@@ -144,6 +150,9 @@ class Answer(Votable):
 
 	class Meta:
 		unique_together = ("question", "answer_text", "author")
+
+	def answer_html(self):
+		return markdown.markdown(bleach.clean(self.answer_text))
 
 	def __str__(self):
 		return self.answer_text

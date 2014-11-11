@@ -13,9 +13,8 @@
 <ul class="lessons">
     {% for lessonTopic in topic_grade.lessontopic_set.all %}
     <li>
-        <a href="{% url 'support:lesson' lessonTopic.lesson.id %}">{{lessonTopic.lesson.name}}</a> 
+        <h3><a href="{% url 'support:lesson' lessonTopic.lesson.id %}">{{lessonTopic.lesson.name}}</a></h3> 
         <p>{{lessonTopic.intro_text}}</p>
-
         {% include "support/forum.html" with page='support:topic_grade' object=lessonTopic  questions=lessonTopic.forum.sorted_questions %}
     </li>
     {% endfor %}

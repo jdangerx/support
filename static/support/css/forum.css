@@ -10,14 +10,20 @@ ul.lessons ul{
 ul li {
     display:block;
     list-style-type: none;
-    background-color: #fafafa;
+    background-color: #fafdfe;
     clear:left;
     padding:1%;
     margin:2% 0;
+    border-radius:4px;
+    box-shadow: 0 3px 10px -5px #99dced;
 }
-ul li div {
+ul li div.vote {
     width:13%;
     float:left;
+    margin-left:0;
+}
+ul li div {
+    margin-left:13%;
 }
 ul li div a{
     display:block;
@@ -30,9 +36,19 @@ ul li ul li {
     background-color:#fff;
 }
 
-ul li p span {
+ul li span {
     color:#333;
     font-style: italic;
+}
+ul li div p:first-child {
+    margin-top:0;
+}
+ul li div ul li {
+    list-style-type: circle;
+    background:transparent;
+    display: list-item;
+    box-shadow: none;
+
 }
 
 @media only screen and (max-width: 480px) {

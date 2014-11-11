@@ -24,5 +24,5 @@ urlpatterns = patterns('',
     url(r'^sign_up/$', views.sign_up, name='sign_up'),
     url(r'^lesson/(?P<lesson_id>\d+)/upload_supplemental_material/$', 
         views.upload_supplemental_material, name='upload_supplemental_material'),
-
+    url(r'^user/(?P<user_id>\d+)/$', views.user, name='user'),
 )
