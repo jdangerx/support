@@ -9,10 +9,6 @@ admin.site.register(Answer)
 admin.site.register(Topic)
 admin.site.register(Vote)
 
-admin.site.register(Lesson)
-admin.site.register(TopicGrade)
-admin.site.register(LessonTopic)
-
 #@admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
     exclude = ('forum',)
@@ -49,4 +45,6 @@ class LessonTopicAdmin(admin.ModelAdmin):
             obj.forum = forum
         obj.save()
 
-# Register your models here.
+admin.site.register(Lesson, LessonAdmin)
+admin.site.register(TopicGrade, TopicGradeAdmin)
+admin.site.register(LessonTopic, LessonTopicAdmin)
