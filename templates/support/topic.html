@@ -6,7 +6,7 @@
 {% block content %}
 
 <h1>{{topic.name}}</h1>
-<p>{{topic.intro_text}}</p>
+{{topic.intro_html|safe}}
 
 <ul>
     {% for topicgrade in topic.topicgrade_set.all %}

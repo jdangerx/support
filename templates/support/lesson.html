@@ -6,9 +6,9 @@
 {% block content %}
 
 <h1>{{lesson.name}}</h1>
-<p>{{lesson.intro_text}}</p>
+{{lesson.intro_html|safe}}
 {% for lessonTopic in lesson.lessontopic_set.all %}
-<p>{{lessonTopic.intro_text }}</p>
+{{lessonTopic.intro_html|safe}}
 {% endfor %}
 
 {% if lesson.supplementalmaterial_set.all.count > 0 %}

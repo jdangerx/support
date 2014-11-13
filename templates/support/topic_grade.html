@@ -5,8 +5,8 @@
 {% endblock %}
 {% block content %}
 
-<h1>{{topic_grade.grade.name}} {{topic_grade.topic.name}}</h1>
-<p>{{topic_grade.intro_text}}</p>
+<h1>{{topic_grade.namee}}</h1>
+{{topic_grade.intro_html|safe}}
 
 {% include "support/forum.html" with page='support:topic_grade' object=topic_grade  questions=topic_grade.forum.sorted_questions %}
 
@@ -14,7 +14,7 @@
     {% for lessonTopic in topic_grade.lessontopic_set.all %}
     <li>
         <h3><a href="{% url 'support:lesson' lessonTopic.lesson.id %}">{{lessonTopic.lesson.name}}</a></h3> 
-        <p>{{lessonTopic.intro_text}}</p>
+        {{lessonTopic.intro_html|safe}}
         {% include "support/forum.html" with page='support:topic_grade' object=lessonTopic  questions=lessonTopic.forum.sorted_questions %}
     </li>
     {% endfor %}

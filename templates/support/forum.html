@@ -3,6 +3,7 @@
 <ul>
     {% for question in questions %}
     <li>
+        <a name="question_{{question.id}}"></a>
         <div class="vote">
             {% if user.is_authenticated %}
             <a href="{% url 'support:up_vote_question' question.id %}?next={% url page object.id %}">&#x25B2;</a>
@@ -20,6 +21,7 @@
         <ul>
             {% for answer in question.sorted_answers %}
             <li>
+                <a name="answer_{{answer.id}}"></a>
                 <div class="vote">
                     {% if user.is_authenticated %}
                     <a href="{% url 'support:up_vote_answer' answer.id %}?next={% url page object.id %}">&#x25B2;</a>
@@ -53,6 +55,8 @@
 {% if user.is_authenticated %}
     <form action="{% url 'support:ask' %}?next={% url page object.id %}" method="post">
     {% csrf_token %}
+        <label for="id_question">your question:</label>
+        <textarea id="id_question" name="question"></textarea>
         <label for="id_forum"> Is this a question about:</label>
         <select id="id_forum" name="forum">
             <option value="{{object.forum.id}}">{{object.name}} in general</option>
@@ -60,7 +64,6 @@
             <option value="{{lessonTopic.forum.id}}">{{lessonTopic.lesson.name}} {{lessonTopic.topic.topic.name}}</option>
             {% endfor %}
         </select>
-        <label for="id_question">your question:</label><textarea id="id_question" name="question"></textarea>
         <input type="submit" value="Ask"/>
     </form> 
 {% else %}

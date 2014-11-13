@@ -63,6 +63,9 @@ class Grade(models.Model):
 	def __str__(self):
 		return self.name
 
+	def intro_html(self):
+		return markdown.markdown(bleach.clean(self.intro_text))
+
 class Unit(models.Model):
 	name = models.CharField(max_length=200)
 	grade = models.ForeignKey(Grade)
@@ -84,6 +87,9 @@ class Topic(models.Model):
 	def __str__(self):
 		return self.name
 
+	def intro_html(self):
+		return markdown.markdown(bleach.clean(self.intro_text))
+
 class Lesson(models.Model):
 	name = models.CharField(max_length=200)
 	intro_text = models.TextField()
@@ -102,6 +108,9 @@ class Lesson(models.Model):
 		for lesson_topic in self.lessontopic_set.all():
 			questions = questions | lesson_topic.forum.question_set.all()
 		return sorted(questions, key=lambda x: x.vote_count(), reverse=True)
+
+ 	def intro_html(self):
+		return markdown.markdown(bleach.clean(self.intro_text))	
 
 
 class Question(Votable):
@@ -129,6 +138,9 @@ class TopicGrade(models.Model):
 
 	def name(self):
 		return self.grade.name + " " + self.topic.name 
+
+	def intro_html(self):
+		return markdown.markdown(bleach.clean(self.intro_text))
 
 
 class SupplementalMaterial(models.Model):
@@ -168,3 +180,6 @@ class LessonTopic(models.Model):
 
 	def name(self):
 		return self.lesson.name + " " + self.topic.topic.name
+
+	def intro_html(self):
+		return markdown.markdown(bleach.clean(self.intro_text))
