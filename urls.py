@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
 
 from support import views
 from django.contrib.auth.views import login, logout
@@ -25,4 +25,5 @@ urlpatterns = patterns('',
     url(r'^lesson/(?P<lesson_id>\d+)/upload_supplemental_material/$', 
         views.upload_supplemental_material, name='upload_supplemental_material'),
     url(r'^user/(?P<user_id>\d+)/$', views.user, name='user'),
+    url(r'^search/', include('haystack.urls')),
 )

@@ -50,7 +50,21 @@ ul li div ul li {
     box-shadow: none;
 
 }
-
+#id_models {
+    float:left;
+    width:70%;
+}
+#id_models li {
+    display:inline;
+    background-color: transparent;
+    border-radius:none;
+    box-shadow:none;
+}
+#id_models li label {
+    display: inline;
+    float:none;
+    clear:none;
+}
 @media only screen and (max-width: 480px) {
     ul li div span{
         font-size: .7em;

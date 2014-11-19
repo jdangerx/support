@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import Sum
-
+from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
 from django.contrib.contenttypes.generic import GenericForeignKey, GenericRelation
@@ -110,8 +110,10 @@ class Lesson(models.Model):
 		return sorted(questions, key=lambda x: x.vote_count(), reverse=True)
 
  	def intro_html(self):
-		return markdown.markdown(bleach.clean(self.intro_text))	
+		return markdown.markdown(bleach.clean(self.intro_text))
 
+	def get_absolute_url(self):
+		return reverse('support:lesson', args=[str(self.id)])	
 
 class Question(Votable):
 	question_text = models.TextField()
@@ -126,6 +128,15 @@ class Question(Votable):
 
 	def sorted_answers(self):
 		return sorted(self.answer_set.all(), key=lambda x: x.vote_count(), reverse=True)
+
+	def get_absolute_url(self):
+		if hasattr(self.forum, 'lesson'):
+			return reverse('support:lesson', args=[str(self.forum.lesson.id)])	+ "#question_" + str(self.id)
+		elif hasattr(self.forum, 'lessontopic'):
+			return reverse('support:lesson', args=[str(self.forum.lessontopic.lesson.id)])	+ "#question_" + str(self.id)
+		elif hasattr(self.forum, 'topicgrade'): 
+			return reverse('support:topic_grade', args=[str(self.forum.topicgrade.id)]) + "#question_" + str(self.id)
+		return ""
 
 class TopicGrade(models.Model):
 	intro_text = models.TextField()
@@ -168,6 +179,15 @@ class Answer(Votable):
 
 	def __str__(self):
 		return self.answer_text
+
+	def get_absolute_url(self):
+		if hasattr(self.question.forum, 'lesson'):
+			return reverse('support:lesson', args=[str(self.id)])	+ "#answer_" + str(self.id)
+		elif hasattr(self.question.forum, 'lessontopic'):
+			return reverse('support:lesson', args=[str(self.id)])	+ "#answer_" + str(self.id)
+		elif hasattr(self.question.forum, 'topicgrade'): 
+			return reverse('support:topic_grade', args=[str(self.id)]) + "#answer_" + str(self.id)
+		return ""
 
 class LessonTopic(models.Model):
 	intro_text = models.TextField()

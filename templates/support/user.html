@@ -13,11 +13,11 @@
 <ul>{% for question in user.question_set.all %}
 	<li>{{question.question_html|safe}}
         {% if question.forum.lesson %}
-        in <a href="{% url 'support:lesson' question.forum.lesson.id %}#question_{{question.id}}">{{question.forum.lesson.name}}</a>
+        in <a href="{{ question.get_absolute_url }}">{{question.forum.lesson.name}}</a>
         {% elif question.forum.lessontopic %}
-        in <a href="{% url 'support:lesson' question.forum.lessontopic.lesson.id %}#question_{{question.id}}">{{question.forum.lessontopic.name}}</a>
+        in <a href="{{ question.get_absolute_url }}">{{question.forum.lessontopic.name}}</a>
         {% elif question.forum.topicgrade %}
-        in <a href="{% url 'support:topic_grade' question.forum.topicgrade.id %}#question_{{question.id}}">{{question.forum.topicgrade}}</a>
+        in <a href="{{ question.get_absolute_url }}">{{question.forum.topicgrade}}</a>
         {% endif %}
 	</li>
 	{% endfor %}
@@ -28,11 +28,11 @@
 <ul>{% for answer in user.answer_set.all %}
     <li>{{answer.answer_html|safe}}
         {% if answer.question.forum.lesson %}
-        in <a href="{% url 'support:lesson' answer.question.forum.lesson.id %}#answer_{{answer.id}}">{{answer.question.forum.lesson.name}}</a>
+        in <a href="{{ question.get_absolute_url }}">{{answer.question.forum.lesson.name}}</a>
         {% elif answer.question.forum.lessontopic %}
-        in <a href="{% url 'support:lesson' answer.question.forum.lessontopic.lesson.id %}#answer_{{answer.id}}">{{answer.question.forum.lessontopic.name}}</a>
+        in <a href="{{ question.get_absolute_url }}">{{answer.question.forum.lessontopic.name}}</a>
         {% elif answer.question.forum.topicgrade %}
-        in <a href="{% url 'support:topic_grade' answer.question.forum.topicgrade.id %}#answer_{{answer.id}}">{{answer.question.forum.topicgrade}}</a>
+        in <a href="{{ question.get_absolute_url }}">{{answer.question.forum.topicgrade}}</a>
         {% endif %}
     </li>
     {% endfor %}

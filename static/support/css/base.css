@@ -5,7 +5,8 @@ body {
     background-color: #def4fa;
 }
 header {
-    background-color: #05a9d3;  
+    background-color: #05a9d3;
+    position: relative;
 }
 header>a{
     display:block;
@@ -15,9 +16,13 @@ header>a{
     border-bottom-right-radius: 10px;
     border-bottom-left-radius: 10px;
     width:12%;
-    background-color: #fff;
+    background-color: #fafdfe;
     text-align: center;
 
+}
+
+header>a:hover{
+    background-color: #fff;
 }
 a {
     color:#0969BF;
@@ -48,9 +53,10 @@ h1, h2, h3 {
     background: linear-gradient(to right, rgba(153,220,237,1) 0%,rgba(222,244,250,0) 25%,rgba(199,243,253,0) 100%);
     border-radius: 2px;
 }
-header span {
-    float:right;
-    padding:5px;
+header span#user {
+    position:absolute;
+    bottom:3px;
+    right:.5%;
 }
 main p {
     line-height: 1.3em;
@@ -73,7 +79,7 @@ label {
     min-width: 96px;
 }
 
-input[type=text],input[type=password],input[type=email] {
+input[type=text],input[type=password],input[type=email],input[type=search] {
     display:block;
     float:left;
     width:35%;
@@ -125,4 +131,13 @@ form span {
 
 form table {
     width:100%;
+}
+
+header input[type=search] {
+    display:block;
+    float:right;
+    clear:right;
+    width:15%;
+    padding:.5% 3px;
+    margin:.5%;
 }

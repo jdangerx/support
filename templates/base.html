@@ -10,7 +10,17 @@
 
 <body>
     <header>
-        <span>
+        <a href="">order</a>
+        <a href="">homework</a>
+        <a href="{% url 'support:index' %}">support</a>
+        <form action="{% url 'support:haystack_search' %}?models=support.answer&models=support.lesson&models=support.question" method="get">
+            <input type="search" name="q" placeholder="search">
+            <input type="hidden" name="models" value="support.answer">
+            <input type="hidden" name="models" value="support.question">
+            <input type="hidden" name="models" value="support.lesson">
+        </form>
+        <h1>Heritage Chinese Center Teacher Support</h1>
+        <span id="user">
         {% if user.is_authenticated %}
             Hello, {{user.username}} <a href="{% url 'support:logout' %}">Log out</a>
         {% else %}
@@ -18,10 +28,6 @@
             <a href="{% url 'support:sign_up' %}">Sign up</a>
         {% endif%}
         </span>
-        <a href="">order</a>
-        <a href="">homework</a>
-        <a href="{% url 'support:index' %}">support</a>
-        <h1>Heritage Chinese Center Teacher Support</h1>
     </header>
     <main>
 	   {% block content %}{% endblock %}

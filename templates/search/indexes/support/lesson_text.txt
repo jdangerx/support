@@ -1,0 +1,5 @@
+{{object.name}}
+{{object.intro_text}}
+{%for lessonTopic in object.lessontopic_set.all%}
+{{lessonTopic.intro_text}}
+{% endfor %}
