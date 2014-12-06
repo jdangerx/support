@@ -16,7 +16,7 @@
 <ul>{% for material in lesson.supplementalmaterial_set.all %}
 	<li>
 		<a href="{{material.material_file.url}}">{{material.name}}</a> 
-		- by {{material.author.username}}
+		- by <a href="{% url 'support:user' material.author.id %}">{{material.author.username}}</a>
 	</li>
 	{% endfor %}
 </ul>

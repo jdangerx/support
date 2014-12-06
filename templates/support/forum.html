@@ -15,7 +15,7 @@
         </div>
         <div>
             {{question.question_html|safe}}
-            <span>asked by {{question.author.username}}</span>
+            <span>asked by <a href="{% url 'support:user' question.author.id %}">{{question.author.username}}</a></span>
             <h3>{{question.answer_set.all.count}} Answer{{question.answer_set.all.count|pluralize}} </h3>
         </div>
         <ul>
@@ -32,7 +32,7 @@
                     {% endif %}
                 </div>
                 <div>{{answer.answer_html|safe}}
-                    <span>answered by {{answer.author.username}}</span>
+                    <span>answered by <a href="{% url 'support:user' answer.author.id %}">{{answer.author.username}}</a></span>
                 </div>
             </li>
             {% endfor %}

@@ -5,7 +5,7 @@
 {% endblock %}
 {% block content %}
 
-<h1>{{topic_grade.namee}}</h1>
+<h1>{{topic_grade.name}}</h1>
 {{topic_grade.intro_html|safe}}
 
 {% include "support/forum.html" with page='support:topic_grade' object=topic_grade  questions=topic_grade.forum.sorted_questions %}

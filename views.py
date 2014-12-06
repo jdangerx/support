@@ -35,7 +35,7 @@ def topic(request, topic_id):
 def lesson(request, lesson_id):
 	lesson = get_object_or_404(Lesson, pk=lesson_id)
 	user_is_moderator = False
-	if request.user.is_authenticated() and request.user.groups.filter(name='moderator').count() > 0:
+	if request.user.is_authenticated() and request.user.groups.filter(name='Moderators').count() > 0:
 		user_is_moderator = True
 	return render(request, 'support/lesson.html', {'lesson': lesson, 'user_is_moderator': user_is_moderator})
 
@@ -157,12 +157,12 @@ def user(request, user_id):
 
 def upload_supplemental_material(request, lesson_id):
 	lesson = get_object_or_404(Lesson, pk=lesson_id)
-	if request.user.is_authenticated and request.user.groups.filter(name='moderator').exists():
+	if request.user.is_authenticated and request.user.groups.filter(name='Moderators').exists():
 		if request.method == 'POST':	
 			sm = SupplementalMaterial.objects.create(author=request.user, lesson=lesson, order=0)
 			form = SupplementalMaterialForm(request.POST, request.FILES, instance=sm)
 			form.save()
-			return HttpResponseRedirect('/support/')
+			return HttpResponseRedirect(lesson.get_absolute_url())
 		else:
 			form = SupplementalMaterialForm()
 

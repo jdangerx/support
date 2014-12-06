@@ -9,6 +9,20 @@ from django.contrib.contenttypes.models import ContentType
 import markdown
 import bleach
 
+ALLOWED_TAGS_UNKNOWN_USER = [
+	'abbr',
+	'acronym',
+	'b',
+	'blockquote',
+	'code',
+	'em',
+	'i',
+	'li',
+	'ol',
+	'p',
+	'strong',
+	'ul',
+]
 class Vote(models.Model):
 	user = models.ForeignKey(User)
 	value = models.IntegerField(default=0)
@@ -19,7 +33,7 @@ class Vote(models.Model):
 	class Meta:
 		unique_together = ("user", "content_type", "object_id")
 
-	def __str__(self):
+	def __unicode__(self):
 		self.content_type
 
 class Votable(models.Model):
@@ -50,7 +64,7 @@ class Forum(models.Model):
 		questions = self.question_set.all()
 		return sorted(questions, key=lambda x: x.vote_count(), reverse=True)
 
-	def __str__(self):
+	def __unicode__(self):
 		return str(self.pk)
 
 class Grade(models.Model):
@@ -60,7 +74,7 @@ class Grade(models.Model):
 	class Meta:
 		ordering = ["order"]
 
-	def __str__(self):
+	def __unicode__(self):
 		return self.name
 
 	def intro_html(self):
@@ -73,7 +87,7 @@ class Unit(models.Model):
 	class Meta:
 		ordering = ["order"]	
 
-	def __str__(self):
+	def __unicode__(self):
 		return self.name + " of " + self.grade.name
 
 class Topic(models.Model):
@@ -84,7 +98,7 @@ class Topic(models.Model):
 	class Meta:
 		ordering = ["order"]
 
-	def __str__(self):
+	def __unicode__(self):
 		return self.name
 
 	def intro_html(self):
@@ -100,7 +114,7 @@ class Lesson(models.Model):
 	class Meta:
 		ordering = ["order"]
 
-	def __str__(self):
+	def __unicode__(self):
 		return self.name + " of " + self.unit.name + " of " + self.unit.grade.name
 
 	def sorted_questions(self):
@@ -116,15 +130,25 @@ class Lesson(models.Model):
 		return reverse('support:lesson', args=[str(self.id)])	
 
 class Question(Votable):
+	PUBLISHED = 'P'
+	FLAGGED = 'F'
+	STATUS_CHOICES = (
+		(PUBLISHED, 'Published'),
+		(FLAGGED, 'Flagged'),
+	)
 	question_text = models.TextField()
 	author = models.ForeignKey(User)
 	forum = models.ForeignKey(Forum)
+	status = models.CharField(max_length=1, choices=STATUS_CHOICES, default=PUBLISHED)
 
-	def __str__(self):
+	def __unicode__(self):
 		return self.question_text
 
 	def question_html(self):
-		return markdown.markdown(bleach.clean(self.question_text))
+		if self.author.groups.filter(name='Moderators').exists() or self.author.groups.filter(name='Contributors').exists():
+			return markdown.markdown(bleach.clean(self.question_text))
+		else:
+			return bleach.clean(markdown.markdown(self.question_text), tags=ALLOWED_TAGS_UNKNOWN_USER, strip=True)
 
 	def sorted_answers(self):
 		return sorted(self.answer_set.all(), key=lambda x: x.vote_count(), reverse=True)
@@ -144,7 +168,7 @@ class TopicGrade(models.Model):
 	grade = models.ForeignKey(Grade)	
 	forum = models.OneToOneField(Forum)
 
-	def __str__(self):
+	def __unicode__(self):
 		return self.grade.name + " " + self.topic.name 
 
 	def name(self):
@@ -163,7 +187,7 @@ class SupplementalMaterial(models.Model):
 	class Meta:
 		ordering = ["order"]
 
-	def __str__(self):
+	def __unicode__(self):
 		return self.name
 
 class Answer(Votable):
@@ -175,9 +199,12 @@ class Answer(Votable):
 		unique_together = ("question", "answer_text", "author")
 
 	def answer_html(self):
-		return markdown.markdown(bleach.clean(self.answer_text))
+		if self.author.groups.filter(name='Moderators').exists() or self.author.groups.filter(name='Contributors').exists():
+			return markdown.markdown(bleach.clean(self.answer_text))
+		else:
+			return bleach.clean(markdown.markdown(self.answer_text), tags=ALLOWED_TAGS_UNKNOWN_USER, strip=True)
 
-	def __str__(self):
+	def __unicode__(self):
 		return self.answer_text
 
 	def get_absolute_url(self):
@@ -195,7 +222,7 @@ class LessonTopic(models.Model):
 	topic = models.ForeignKey(TopicGrade)
 	forum = models.OneToOneField(Forum)
 	
-	def __str__(self):
+	def __unicode__(self):
 		return self.lesson.name + " " + self.topic.topic.name
 
 	def name(self):
@@ -203,3 +230,8 @@ class LessonTopic(models.Model):
 
 	def intro_html(self):
 		return markdown.markdown(bleach.clean(self.intro_text))
+
+class UserProfile(models.Model):
+	user = models.OneToOneField(User)
+	avatar = models.ImageField(upload_to='support/avatar/')
+	intro_text = models.TextField()

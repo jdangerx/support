@@ -1,6 +1,6 @@
 from django.contrib import admin
 from support.models import Grade, Unit, Lesson, SupplementalMaterial, Question, Answer, Topic, TopicGrade, Vote, LessonTopic, Forum
-
+from django.contrib.auth.models import User
 
 admin.site.register(Question)
 admin.site.register(Answer)
@@ -51,6 +51,31 @@ class LessonTopicAdmin(admin.ModelAdmin):
             forum.save()
             obj.forum = forum
         obj.save()
+
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff' ,'karma', 'group')
+
+    def karma(self, obj):
+        karma = 0
+        for question in obj.question_set.all():
+            karma += 1
+            karma += question.vote_count()
+        for answer in obj.answer_set.all():
+            karma += 5
+            karma += answer.vote_count()
+        return karma
+
+    def group(self, obj):
+        if obj.groups.filter(name='Moderators').count() > 0:
+            return "Moderator"
+        elif obj.groups.filter(name='Contributors').count() > 0:
+            return "Contributor"
+        else:
+            return ""
+
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 
 admin.site.register(Lesson, LessonAdmin)
 admin.site.register(TopicGrade, TopicGradeAdmin)
