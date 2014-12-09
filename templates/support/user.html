@@ -7,6 +7,7 @@
 {% block content %}
 
 <h1>{{user.username}}</h1>
+<p>{{user.userprofile.intro_text}}</p>
 
 {% if user.question_set.all.count > 0 %}
 <h2>Questions</h2>

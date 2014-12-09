@@ -12,6 +12,14 @@
             {% if user.is_authenticated %}
             <a href="{% url 'support:down_vote_question' question.id %}?next={% url page object.id %}">&#x25BC;</a>
             {% endif %}
+            <p>
+                {% if question.author.id == user.id %}
+                <a href="#todo">edit</a>
+                {% endif %}
+                {% if user.userprofile.group == "Moderator" or user.userprofile.group == "Contributor" %}
+                <a href="#todo">flag</a>
+                {% endif %}
+            </p>
         </div>
         <div>
             {{question.question_html|safe}}

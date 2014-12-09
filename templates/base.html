@@ -22,7 +22,7 @@
         <h1>Heritage Chinese Center Teacher Support</h1>
         <span id="user">
         {% if user.is_authenticated %}
-            Hello, {{user.username}} <a href="{% url 'support:logout' %}">Log out</a>
+            Hello, {{user.username}} <a href="{% url 'support:logout' %}?next={% url 'support:index' %}">Log out</a>
         {% else %}
             <a href="{% url 'support:login' %}">Log in</a> or
             <a href="{% url 'support:sign_up' %}">Sign up</a>

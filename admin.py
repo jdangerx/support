@@ -1,11 +1,11 @@
 from django.contrib import admin
-from support.models import Grade, Unit, Lesson, SupplementalMaterial, Question, Answer, Topic, TopicGrade, Vote, LessonTopic, Forum
+from support.models import Grade, Unit, Lesson, SupplementalMaterial, Question, Answer, Topic, TopicGrade, Vote, LessonTopic, Forum, UserProfile
 from django.contrib.auth.models import User
 
 admin.site.register(Question)
 admin.site.register(Answer)
-
 admin.site.register(Vote)
+admin.site.register(UserProfile)
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'order')
@@ -66,9 +66,9 @@ class UserAdmin(admin.ModelAdmin):
         return karma
 
     def group(self, obj):
-        if obj.groups.filter(name='Moderators').count() > 0:
+        if obj.groups.filter(name='Moderators').exists():
             return "Moderator"
-        elif obj.groups.filter(name='Contributors').count() > 0:
+        elif obj.groups.filter(name='Contributors').exists():
             return "Contributor"
         else:
             return ""
