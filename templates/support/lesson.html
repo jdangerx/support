@@ -3,6 +3,10 @@
 {% block style %}
 <link rel="stylesheet" type="text/css" href="{% static 'support/css/forum.css' %}">
 {% endblock %}
+{% block script %}
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="{% static 'support/js/forum.js' %}"></script>
+{% endblock %}
 {% block content %}
 
 <h1>{{lesson.name}}</h1>

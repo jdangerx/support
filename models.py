@@ -61,10 +61,16 @@ class Votable(models.Model):
 class Forum(models.Model):
 
     def sorted_questions(self):
-        questions = self.question_set.all()
+        questions = self.question_set.filter(status='P')
         return sorted(questions, key=lambda x: x.vote_count(), reverse=True)
 
     def __unicode__(self):
+        if hasattr(self, 'lesson'):
+            return 'Lesson: '+ self.lesson.name
+        elif hasattr(self, 'lessontopic'):
+            return 'Lesson Topic: '+ self.lessontopic.name()
+        elif hasattr(self, 'topicgrade'): 
+            return 'Topic Grade: '+ self.topicgrade.name()
         return str(self.pk)
 
 class Grade(models.Model):
@@ -118,9 +124,9 @@ class Lesson(models.Model):
         return self.name + " of " + self.unit.name + " of " + self.unit.grade.name
 
     def sorted_questions(self):
-        questions = self.forum.question_set.all()
+        questions = self.forum.question_set.filter(status='P')
         for lesson_topic in self.lessontopic_set.all():
-            questions = questions | lesson_topic.forum.question_set.all()
+            questions = questions | lesson_topic.forum.question_set.filter(status='P')
         return sorted(questions, key=lambda x: x.vote_count(), reverse=True)
 
     def intro_html(self):
@@ -151,7 +157,7 @@ class Question(Votable):
             return bleach.clean(markdown.markdown(self.question_text), tags=ALLOWED_TAGS_UNKNOWN_USER, strip=True)
 
     def sorted_answers(self):
-        return sorted(self.answer_set.all(), key=lambda x: x.vote_count(), reverse=True)
+        return sorted(self.answer_set.filter(status='P'), key=lambda x: x.vote_count(), reverse=True)
 
     def get_absolute_url(self):
         if hasattr(self.forum, 'lesson'):
@@ -181,7 +187,7 @@ class TopicGrade(models.Model):
 class SupplementalMaterial(models.Model):
     name = models.CharField(max_length=200)
     material_file = models.FileField(upload_to='support/')
-    lesson = models.ForeignKey(Lesson)
+    forum = models.ManyToManyField(Forum)
     author = models.ForeignKey(User)
     order = models.IntegerField(default=0)
     class Meta:
@@ -191,6 +197,13 @@ class SupplementalMaterial(models.Model):
         return self.name
 
 class Answer(Votable):
+    PUBLISHED = 'P'
+    FLAGGED = 'F'
+    STATUS_CHOICES = (
+        (PUBLISHED, 'Published'),
+        (FLAGGED, 'Flagged'),
+    )
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, default=PUBLISHED)
     answer_text = models.TextField()
     question = models.ForeignKey(Question)
     author = models.ForeignKey(User)

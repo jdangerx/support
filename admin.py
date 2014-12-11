@@ -2,8 +2,11 @@ from django.contrib import admin
 from support.models import Grade, Unit, Lesson, SupplementalMaterial, Question, Answer, Topic, TopicGrade, Vote, LessonTopic, Forum, UserProfile
 from django.contrib.auth.models import User
 
-admin.site.register(Question)
-admin.site.register(Answer)
+class QuestionAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'status', 'vote_count')
+admin.site.register(Question, QuestionAdmin)
+
+admin.site.register(Answer, QuestionAdmin)
 admin.site.register(Vote)
 admin.site.register(UserProfile)
 

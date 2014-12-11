@@ -99,10 +99,32 @@ def down_vote_question(request, question_id):
         return render(request, 'support/lesson.html', {'lesson': question.get_lesson()})
 
 def edit_question(request, question_id):
-	pass
+    question = get_object_or_404(Question, pk=question_id)
+    if request.user.is_authenticated and request.user.id == question.author.id:
+        question.question_text = request.POST['question']
+        question.save()
+
+        if('next' in request.POST or 'next' in request.GET):
+            next_page = request.POST.get('next', request.GET.get('next'))
+            # Security check -- don't allow redirection to a different host.
+            if not is_safe_url(url=next_page, host=request.get_host()):
+                next_page = request.path
+        if next_page:
+            return HttpResponseRedirect(next_page)
+
 
 def flag_question(request, question_id):
-	pass
+    question = get_object_or_404(Question, pk=question_id)
+    question.status = 'F'
+    question.save();
+
+    if('next' in request.POST or 'next' in request.GET):
+        next_page = request.POST.get('next', request.GET.get('next'))
+        # Security check -- don't allow redirection to a different host.
+        if not is_safe_url(url=next_page, host=request.get_host()):
+            next_page = request.path
+    if next_page:
+        return HttpResponseRedirect(next_page)    
 
 def answer(request):
     if request.method == 'POST':    
@@ -153,10 +175,31 @@ def down_vote_answer(request, answer_id):
 
 
 def edit_answer(request, answer_id):
-	pass
+    answer = get_object_or_404(Answer, pk=answer_id )
+    if request.user.is_authenticated and request.user.id == answer.author.id:
+        answer.answer_text = request.POST['answer']
+        answer.save()
+
+        if('next' in request.POST or 'next' in request.GET):
+            next_page = request.POST.get('next', request.GET.get('next'))
+            # Security check -- don't allow redirection to a different host.
+            if not is_safe_url(url=next_page, host=request.get_host()):
+                next_page = request.path
+        if next_page:
+            return HttpResponseRedirect(next_page)
 
 def flag_answer(request, answer_id):
-	pass
+    answer = get_object_or_404(Answer, pk=answer_id)
+    answer.status = 'F'
+    answer.save();
+
+    if('next' in request.POST or 'next' in request.GET):
+        next_page = request.POST.get('next', request.GET.get('next'))
+        # Security check -- don't allow redirection to a different host.
+        if not is_safe_url(url=next_page, host=request.get_host()):
+            next_page = request.path
+    if next_page:
+        return HttpResponseRedirect(next_page)    
 
 def sign_up(request):
     if request.method == 'POST':

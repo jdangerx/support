@@ -12,18 +12,22 @@
             {% if user.is_authenticated %}
             <a href="{% url 'support:down_vote_question' question.id %}?next={% url page object.id %}">&#x25BC;</a>
             {% endif %}
-            <p>
-                {% if question.author.id == user.id %}
-                <a href="#todo">edit</a>
-                {% endif %}
-                {% if user.userprofile.group == "Moderator" or user.userprofile.group == "Contributor" %}
-                <a href="#todo">flag</a>
-                {% endif %}
-            </p>
+
+            {% if question.author.id == user.id %}
+            <a href="" class="edit" id="questionedit_{{question.id}}">edit</a>
+            {% endif %}
+            {% if user.userprofile.group == "Moderator" or user.userprofile.group == "Contributor" %}
+            <a href="" class="flag" data-url="{% url 'support:flag_question' question.id%}?next={% url page object.id %}">flag</a>
+            {% endif %}
         </div>
         <div>
-            {{question.question_html|safe}}
-            <span>asked by <a href="{% url 'support:user' question.author.id %}">{{question.author.username}}</a></span>
+            <span>{{question.question_html|safe}}</span>
+            <form action="{% url 'support:edit_question' question.id%}?next={% url page object.id %}" method="post" id="editquestion_{{question.id}}" class="hidden">
+                {% csrf_token %}
+                <label>your question:</label><textarea name="question">{{question.question_text}}</textarea>
+                <input type="submit" value="Submit"/><button type="button">Cancel</button>
+            </form>
+            <span class="author">asked by <a href="{% url 'support:user' question.author.id %}">{{question.author.username}}</a></span>
             <h3>{{question.answer_set.all.count}} Answer{{question.answer_set.all.count|pluralize}} </h3>
         </div>
         <ul>
@@ -38,9 +42,22 @@
                     {% if user.is_authenticated %}
                     <a href="{% url 'support:down_vote_answer' answer.id %}?next={% url page object.id %}">&#x25BC;</a>
                     {% endif %}
+                    
+                    {% if answer.author.id == user.id %}
+                    <a href="" class="edit" id="answeredit_{{answer.id}}">edit</a>
+                    {% endif %}
+                    {% if user.userprofile.group == "Moderator" or user.userprofile.group == "Contributor" %}
+                    <a href="" class="flag" data-url="{% url 'support:flag_answer' answer.id%}?next={% url page object.id %}">flag</a>
+                    {% endif %}
                 </div>
-                <div>{{answer.answer_html|safe}}
-                    <span>answered by <a href="{% url 'support:user' answer.author.id %}">{{answer.author.username}}</a></span>
+                <div>
+                    <span>{{answer.answer_html|safe}}</span>
+                    <form action="{% url 'support:edit_answer' answer.id%}?next={% url page object.id %}" method="post" id="editanswer_{{answer.id}}" class="hidden">
+                        {% csrf_token %}
+                        <label>your answer:</label><textarea name="answer">{{answer.answer_text}}</textarea>
+                        <input type="submit" value="Submit"/><button type="button">Cancel</button>
+                    </form>
+                    <span class="author">answered by <a href="{% url 'support:user' answer.author.id %}">{{answer.author.username}}</a></span>
                 </div>
             </li>
             {% endfor %}
@@ -78,3 +95,5 @@
     <a href="{% url 'support:login' %}?next={% url page object.id %}">Log in</a> or
     <a href="{% url 'support:sign_up' %}?next={% url page object.id %}">Sign up</a> to ask a question
 {% endif%}
+
+<div class="hidden" id="flag_alert">Are you sure you want to flag this? <a href="" class="yes">Yes</a> <a href="" class="no">No</a></div>
