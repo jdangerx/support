@@ -216,17 +216,17 @@ def user(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     return render(request, 'support/user.html', {'user': user})
 
-def upload_supplemental_material(request, lesson_id):
-    lesson = get_object_or_404(Lesson, pk=lesson_id)
+def upload_supplemental_material(request, forum_id):
+    forum = get_object_or_404(Forum, pk=forum_id)
     if request.user.is_authenticated and request.user.groups.filter(name='Moderators').exists():
         if request.method == 'POST':    
-            sm = SupplementalMaterial.objects.create(author=request.user, lesson=lesson, order=0)
+            sm = SupplementalMaterial.objects.create(author=request.user, forum=forum, order=0)
             form = SupplementalMaterialForm(request.POST, request.FILES, instance=sm)
             form.save()
-            return HttpResponseRedirect(lesson.get_absolute_url())
+            return HttpResponseRedirect(forum.get_absolute_url())
         else:
             form = SupplementalMaterialForm()
 
-        return render(request, 'support/upload_supplemental_material.html', {'form': form, 'lesson':lesson})
+        return render(request, 'support/upload_supplemental_material.html', {'form': form, 'forum':forum})
     else:
         return HttpResponseRedirect('/support/')

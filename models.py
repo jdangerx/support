@@ -73,6 +73,15 @@ class Forum(models.Model):
             return 'Topic Grade: '+ self.topicgrade.name()
         return str(self.pk)
 
+    def get_absolute_url(self):
+        if hasattr(self, 'lesson'):
+            return reverse('support:lesson', args=[str(self.lesson.id)])
+        elif hasattr(self, 'lessontopic'):
+            return reverse('support:lesson', args=[str(self.lessontopic.lesson.id)])
+        elif hasattr(self, 'topicgrade'): 
+            return reverse('support:topic_grade', args=[str(self.topicgrade.id)])
+        return ""
+
 class Grade(models.Model):
     name = models.CharField(max_length=200)
     intro_text = models.TextField()
