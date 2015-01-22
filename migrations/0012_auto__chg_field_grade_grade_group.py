@@ -8,28 +8,14 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'GradeGroup'
-        db.create_table(u'support_gradegroup', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=200)),
-            ('intro_text', self.gf('django.db.models.fields.TextField')()),
-            ('order', self.gf('django.db.models.fields.IntegerField')(default=0)),
-        ))
-        db.send_create_signal(u'support', ['GradeGroup'])
 
-        # Adding field 'Grade.grade_group'
-        #db.add_column(u'support_grade', 'grade_group',
-        #              self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['support.GradeGroup']),
-        #              keep_default=False)
-
+        # Changing field 'Grade.grade_group'
+        db.alter_column(u'support_grade', 'grade_group_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['support.GradeGroup'], null=True))
 
     def backwards(self, orm):
-        # Deleting model 'GradeGroup'
-        db.delete_table(u'support_gradegroup')
 
-        # Deleting field 'Grade.grade_group'
-        db.delete_column(u'support_grade', 'grade_group_id')
-
+        # Changing field 'Grade.grade_group'
+        db.alter_column(u'support_grade', 'grade_group_id', self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['support.GradeGroup']))
 
     models = {
         u'auth.group': {
@@ -68,21 +54,9 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        u'support.answer': {
-            'Meta': {'unique_together': "(('question', 'answer_text', 'author'),)", 'object_name': 'Answer'},
-            'answer_text': ('django.db.models.fields.TextField', [], {}),
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'question': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['support.Question']"}),
-            'status': ('django.db.models.fields.CharField', [], {'default': "'P'", 'max_length': '1'})
-        },
-        u'support.forum': {
-            'Meta': {'object_name': 'Forum'},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
-        },
         u'support.grade': {
             'Meta': {'ordering': "['order']", 'object_name': 'Grade'},
-            'grade_group': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['support.GradeGroup']"}),
+            'grade_group': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['support.GradeGroup']", 'null': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'intro_text': ('django.db.models.fields.TextField', [], {}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
@@ -97,58 +71,49 @@ class Migration(SchemaMigration):
         },
         u'support.lesson': {
             'Meta': {'ordering': "['order']", 'object_name': 'Lesson'},
-            'forum': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['support.Forum']", 'unique': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'intro_text': ('django.db.models.fields.TextField', [], {}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'unit': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['support.Unit']"})
+            'unit': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['support.Unit']"}),
+            'week_length': ('django.db.models.fields.IntegerField', [], {'default': '1'})
         },
-        u'support.lessontopic': {
-            'Meta': {'object_name': 'LessonTopic'},
-            'forum': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['support.Forum']", 'unique': 'True'}),
+        u'support.lessoncategory': {
+            'Meta': {'ordering': "['order']", 'object_name': 'LessonCategory'},
+            'category_type': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['support.LessonCategoryType']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'intro_text': ('django.db.models.fields.TextField', [], {}),
             'lesson': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['support.Lesson']"}),
-            'topic': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['support.TopicGrade']"})
+            'order': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
-        u'support.question': {
-            'Meta': {'object_name': 'Question'},
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'forum': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['support.Forum']"}),
+        u'support.lessoncategorytype': {
+            'Meta': {'object_name': 'LessonCategoryType'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'question_text': ('django.db.models.fields.TextField', [], {}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'})
+        },
+        u'support.post': {
+            'Meta': {'object_name': 'Post'},
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
+            'content_text': ('django.db.models.fields.TextField', [], {}),
+            'date_time': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_question': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'lesson_category': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['support.LessonCategory']"}),
+            'replying_to': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'replies'", 'null': 'True', 'to': u"orm['support.Post']"}),
             'status': ('django.db.models.fields.CharField', [], {'default': "'P'", 'max_length': '1'})
         },
         u'support.supplementalmaterial': {
             'Meta': {'ordering': "['order']", 'object_name': 'SupplementalMaterial'},
             'author': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"}),
-            'forum': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['support.Forum']", 'symmetrical': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'material_file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'order': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
-        u'support.topic': {
-            'Meta': {'ordering': "['order']", 'object_name': 'Topic'},
-            'grade': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['support.Grade']", 'through': u"orm['support.TopicGrade']", 'symmetrical': 'False'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'intro_text': ('django.db.models.fields.TextField', [], {}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'order': ('django.db.models.fields.IntegerField', [], {'default': '0'})
-        },
-        u'support.topicgrade': {
-            'Meta': {'object_name': 'TopicGrade'},
-            'forum': ('django.db.models.fields.related.OneToOneField', [], {'to': u"orm['support.Forum']", 'unique': 'True'}),
-            'grade': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['support.Grade']"}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'intro_text': ('django.db.models.fields.TextField', [], {}),
-            'topic': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['support.Topic']"})
-        },
         u'support.unit': {
             'Meta': {'ordering': "['order']", 'object_name': 'Unit'},
             'grade': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['support.Grade']"}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'intro_text': ('django.db.models.fields.TextField', [], {}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'order': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
