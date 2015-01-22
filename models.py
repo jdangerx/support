@@ -1,3 +1,4 @@
+from datetime import datetime 
 from django.db import models
 from django.db.models import Sum
 from django.core.urlresolvers import reverse
@@ -58,34 +59,22 @@ class Votable(models.Model):
             else:
                 v.update(value= value)
 
-class Forum(models.Model):
+class GradeGroup(models.Model):
+    name = models.CharField(max_length=200)
+    intro_text = models.TextField()
+    order = models.IntegerField(default=0)
 
-    def sorted_questions(self):
-        questions = self.question_set.filter(status='P')
-        return sorted(questions, key=lambda x: x.vote_count(), reverse=True)
+    class Meta:
+        ordering = ["order"]
 
-    def __unicode__(self):
-        if hasattr(self, 'lesson'):
-            return 'Lesson: '+ self.lesson.name
-        elif hasattr(self, 'lessontopic'):
-            return 'Lesson Topic: '+ self.lessontopic.name()
-        elif hasattr(self, 'topicgrade'): 
-            return 'Topic Grade: '+ self.topicgrade.name()
-        return str(self.pk)
-
-    def get_absolute_url(self):
-        if hasattr(self, 'lesson'):
-            return reverse('support:lesson', args=[str(self.lesson.id)])
-        elif hasattr(self, 'lessontopic'):
-            return reverse('support:lesson', args=[str(self.lessontopic.lesson.id)])
-        elif hasattr(self, 'topicgrade'): 
-            return reverse('support:topic_grade', args=[str(self.topicgrade.id)])
-        return ""
+    def __unicode__(self): 
+        return self.name
 
 class Grade(models.Model):
     name = models.CharField(max_length=200)
     intro_text = models.TextField()
     order = models.IntegerField(default=0)
+    grade_group = models.ForeignKey(GradeGroup)
     class Meta:
         ordering = ["order"]
 
@@ -97,6 +86,7 @@ class Grade(models.Model):
 
 class Unit(models.Model):
     name = models.CharField(max_length=200)
+    intro_text = models.TextField()
     grade = models.ForeignKey(Grade)
     order = models.IntegerField(default=0)
     class Meta:
@@ -105,26 +95,12 @@ class Unit(models.Model):
     def __unicode__(self):
         return self.name + " of " + self.grade.name
 
-class Topic(models.Model):
-    name = models.CharField(max_length=200)
-    intro_text = models.TextField()
-    grade = models.ManyToManyField(Grade, through='TopicGrade')
-    order = models.IntegerField(default=0)
-    class Meta:
-        ordering = ["order"]
-
-    def __unicode__(self):
-        return self.name
-
-    def intro_html(self):
-        return markdown.markdown(bleach.clean(self.intro_text))
-
 class Lesson(models.Model):
     name = models.CharField(max_length=200)
     intro_text = models.TextField()
     unit = models.ForeignKey(Unit)
     order = models.IntegerField(default=0)
-    forum = models.OneToOneField(Forum)
+    week_length = models.IntegerField(default=1)
 
     class Meta:
         ordering = ["order"]
@@ -132,71 +108,71 @@ class Lesson(models.Model):
     def __unicode__(self):
         return self.name + " of " + self.unit.name + " of " + self.unit.grade.name
 
-    def sorted_questions(self):
-        questions = self.forum.question_set.filter(status='P')
-        for lesson_topic in self.lessontopic_set.all():
-            questions = questions | lesson_topic.forum.question_set.filter(status='P')
-        return sorted(questions, key=lambda x: x.vote_count(), reverse=True)
-
     def intro_html(self):
         return markdown.markdown(bleach.clean(self.intro_text))
 
     def get_absolute_url(self):
         return reverse('support:lesson', args=[str(self.id)])    
 
-class Question(Votable):
+class LessonCategoryType(models.Model):
+    name = models.CharField(max_length=200)
+
+    def __unicode__(self):
+        return self.name
+
+class LessonCategory(models.Model):
+    category_type = models.ForeignKey(LessonCategoryType)
+    lesson = models.ForeignKey(Lesson)
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __unicode__(self):
+        return self.lesson.name + " " + self.category_type.name
+
+    def sorted_posts(self):
+        posts = self.post_set.filter(status='P', replying_to=None)
+        return sorted(posts, key=lambda x: x.vote_count(), reverse=True)
+
+
+class Post(Votable):
     PUBLISHED = 'P'
     FLAGGED = 'F'
     STATUS_CHOICES = (
         (PUBLISHED, 'Published'),
         (FLAGGED, 'Flagged'),
     )
-    question_text = models.TextField()
-    author = models.ForeignKey(User)
-    forum = models.ForeignKey(Forum)
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default=PUBLISHED)
+    author = models.ForeignKey(User)
+    content_text = models.TextField()
+    lesson_category = models.ForeignKey(LessonCategory)
+    replying_to = models.ForeignKey('self',blank=True, null=True, related_name='replies')
+    is_question = models.BooleanField(default=False)
+    date_time = models.DateTimeField(default=datetime.now)
+
+
+    def content_html(self):
+        if self.author.groups.filter(name='Moderators').exists() or self.author.groups.filter(name='Contributors').exists():
+            return markdown.markdown(bleach.clean(self.content_text))
+        else:
+            return bleach.clean(markdown.markdown(self.content_text), tags=ALLOWED_TAGS_UNKNOWN_USER, strip=True)
 
     def __unicode__(self):
-        return self.question_text
-
-    def question_html(self):
-        if self.author.groups.filter(name='Moderators').exists() or self.author.groups.filter(name='Contributors').exists():
-            return markdown.markdown(bleach.clean(self.question_text))
-        else:
-            return bleach.clean(markdown.markdown(self.question_text), tags=ALLOWED_TAGS_UNKNOWN_USER, strip=True)
-
-    def sorted_answers(self):
-        return sorted(self.answer_set.filter(status='P'), key=lambda x: x.vote_count(), reverse=True)
+        return self.content_text
 
     def get_absolute_url(self):
-        if hasattr(self.forum, 'lesson'):
-            return reverse('support:lesson', args=[str(self.forum.lesson.id)])    + "#question_" + str(self.id)
-        elif hasattr(self.forum, 'lessontopic'):
-            return reverse('support:lesson', args=[str(self.forum.lessontopic.lesson.id)])    + "#question_" + str(self.id)
-        elif hasattr(self.forum, 'topicgrade'): 
-            return reverse('support:topic_grade', args=[str(self.forum.topicgrade.id)]) + "#question_" + str(self.id)
+        if hasattr(self.lesson_category, 'lesson'):
+            return reverse('support:lesson', args=[str(self.lesson_category.lesson.id)])    + "#post_" + str(self.id)
         return ""
 
-class TopicGrade(models.Model):
-    intro_text = models.TextField()
-    topic = models.ForeignKey(Topic)
-    grade = models.ForeignKey(Grade)    
-    forum = models.OneToOneField(Forum)
-
-    def __unicode__(self):
-        return self.grade.name + " " + self.topic.name 
-
-    def name(self):
-        return self.grade.name + " " + self.topic.name 
-
-    def intro_html(self):
-        return markdown.markdown(bleach.clean(self.intro_text))
-
+    def sorted_replies(self):
+        posts = self.replies.filter(status='P')
+        return sorted(posts, key=lambda x: x.vote_count(), reverse=True)
 
 class SupplementalMaterial(models.Model):
     name = models.CharField(max_length=200)
     material_file = models.FileField(upload_to='support/')
-    forum = models.ManyToManyField(Forum)
     author = models.ForeignKey(User)
     order = models.IntegerField(default=0)
     class Meta:
@@ -204,54 +180,6 @@ class SupplementalMaterial(models.Model):
 
     def __unicode__(self):
         return self.name
-
-class Answer(Votable):
-    PUBLISHED = 'P'
-    FLAGGED = 'F'
-    STATUS_CHOICES = (
-        (PUBLISHED, 'Published'),
-        (FLAGGED, 'Flagged'),
-    )
-    status = models.CharField(max_length=1, choices=STATUS_CHOICES, default=PUBLISHED)
-    answer_text = models.TextField()
-    question = models.ForeignKey(Question)
-    author = models.ForeignKey(User)
-
-    class Meta:
-        unique_together = ("question", "answer_text", "author")
-
-    def answer_html(self):
-        if self.author.groups.filter(name='Moderators').exists() or self.author.groups.filter(name='Contributors').exists():
-            return markdown.markdown(bleach.clean(self.answer_text))
-        else:
-            return bleach.clean(markdown.markdown(self.answer_text), tags=ALLOWED_TAGS_UNKNOWN_USER, strip=True)
-
-    def __unicode__(self):
-        return self.answer_text
-
-    def get_absolute_url(self):
-        if hasattr(self.question.forum, 'lesson'):
-            return reverse('support:lesson', args=[str(self.id)])    + "#answer_" + str(self.id)
-        elif hasattr(self.question.forum, 'lessontopic'):
-            return reverse('support:lesson', args=[str(self.id)])    + "#answer_" + str(self.id)
-        elif hasattr(self.question.forum, 'topicgrade'): 
-            return reverse('support:topic_grade', args=[str(self.id)]) + "#answer_" + str(self.id)
-        return ""
-
-class LessonTopic(models.Model):
-    intro_text = models.TextField()
-    lesson = models.ForeignKey(Lesson)
-    topic = models.ForeignKey(TopicGrade)
-    forum = models.OneToOneField(Forum)
-    
-    def __unicode__(self):
-        return self.lesson.name + " " + self.topic.topic.name
-
-    def name(self):
-        return self.lesson.name + " " + self.topic.topic.name
-
-    def intro_html(self):
-        return markdown.markdown(bleach.clean(self.intro_text))
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
@@ -274,3 +202,6 @@ class UserProfile(models.Model):
 
     def is_contributor(self):
         return self.user.groups.filter(name='Contributors').exists()
+
+
+

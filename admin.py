@@ -1,60 +1,34 @@
 from django.contrib import admin
-from support.models import Grade, Unit, Lesson, SupplementalMaterial, Question, Answer, Topic, TopicGrade, Vote, LessonTopic, Forum, UserProfile
+from support.models import Grade, GradeGroup, Unit, Lesson, SupplementalMaterial, Vote, LessonCategory, LessonCategoryType, UserProfile, Post
 from django.contrib.auth.models import User
 
-class QuestionAdmin(admin.ModelAdmin):
+class PostAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'status', 'vote_count')
-admin.site.register(Question, QuestionAdmin)
+admin.site.register(Post, PostAdmin)
 
-admin.site.register(Answer, QuestionAdmin)
 admin.site.register(Vote)
 admin.site.register(UserProfile)
+admin.site.register(LessonCategoryType)
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'order')
     list_editable = ['order']
+
 admin.site.register(Grade, OrderAdmin)
 admin.site.register(Unit, OrderAdmin)
 admin.site.register(SupplementalMaterial, OrderAdmin)
-admin.site.register(Topic, OrderAdmin)
+admin.site.register(GradeGroup, OrderAdmin)
 
-#@admin.register(Lesson)
+class LessonCategoryInline(admin.TabularInline):
+    model = LessonCategory
+
 class LessonAdmin(admin.ModelAdmin):
-    exclude = ('forum',)
-    list_display = ('__str__', 'forum','order')
+    list_display = ('__str__', 'order')
     list_editable = ['order']
-
-    def save_model(self, request, obj, form, change):
-        if change == False:
-            forum = Forum.objects.create()
-            forum.save()
-            obj.forum = forum
-        obj.save()
-
-#@admin.register(TopicGrade)
-class TopicGradeAdmin(admin.ModelAdmin):
-    exclude = ('forum',)
-    list_display = ('__str__', 'forum')
-
-    def save_model(self, request, obj, form, change):
-        if change == False:
-            forum = Forum.objects.create()
-            forum.save()
-            obj.forum = forum
-        obj.save()
-
-#@admin.register(LessonTopic)
-class LessonTopicAdmin(admin.ModelAdmin):
-    exclude = ('forum',)
-    list_display = ('__str__', 'forum')
-
-    def save_model(self, request, obj, form, change):
-        if change == False:
-            forum = Forum.objects.create()
-            forum.save()
-            obj.forum = forum
-        obj.save()
-
+    inlines = [
+        LessonCategoryInline,
+        ]
+admin.site.register(Lesson,LessonAdmin)
 class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff' ,'karma', 'group')
 
@@ -79,7 +53,3 @@ class UserAdmin(admin.ModelAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-
-admin.site.register(Lesson, LessonAdmin)
-admin.site.register(TopicGrade, TopicGradeAdmin)
-admin.site.register(LessonTopic, LessonTopicAdmin)

@@ -5,34 +5,27 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.db.models import Count, Q
 
-from support.models import Grade, Topic, Lesson, Question, Answer, SupplementalMaterial, TopicGrade, Forum
+from support.models import Grade, GradeGroup, Lesson, Post, SupplementalMaterial, LessonCategory
 from support.forms import SignUpForm, SupplementalMaterialForm
 
 
 #helper function for sorting users by votes
 def user_votes(user):
     votes = 0
-    for question in user.question_set.all():
-        votes += question.vote_count()
-    for answer in user.answer_set.all():
-        votes += answer.vote_count()
+    for post in user.post_set.all():
+        votes += post.vote_count()
     return votes
 
 def index(request):
-    all_grades = Grade.objects.all()
-    all_topics = Topic.objects.all()
-    all_users = User.objects.annotate(Count('question')).annotate(Count('answer')).filter(Q(question__count__gt=0) | Q( answer__count__gt=0))
+    all_grades_groups = GradeGroup.objects.all()
+    all_users = User.objects.annotate(Count('post')).filter(Q(post__count__gt=0))
     all_users = sorted(all_users, key=lambda user: user_votes(user), reverse=True)
-    context = {'all_grades': all_grades, 'all_topics': all_topics, 'all_users': all_users}
+    context = {'all_grades_groups': all_grades_groups, 'all_users': all_users}
     return render(request, 'support/index.html', context)
 
-def grade(request, grade_id):
-    grade = get_object_or_404(Grade, pk=grade_id)
-    return render(request, 'support/grade.html', {'grade': grade})
-
-def topic(request, topic_id):
-    topic = get_object_or_404(Topic, pk=topic_id)
-    return render(request, 'support/topic.html', {'topic': topic})
+def grade_group(request, grade_group_id):
+    grade_group = get_object_or_404(GradeGroup, pk=grade_group_id)
+    return render(request, 'support/grade_group.html', {'grade_group': grade_group})
 
 def lesson(request, lesson_id):
     lesson = get_object_or_404(Lesson, pk=lesson_id)
@@ -44,18 +37,21 @@ def lesson(request, lesson_id):
         user_is_contributor = True
     return render(request, 'support/lesson.html', {'lesson': lesson, 'user_is_moderator': user_is_moderator, 'user_is_contributor': user_is_contributor})
 
-def topic_grade(request, topic_grade_id):
-    topic_grade = get_object_or_404(TopicGrade, pk=topic_grade_id)
-    return render(request, 'support/topic_grade.html', {'topic_grade': topic_grade})
 
-def ask(request):
+def create_post(request, lesson_category_id):
     if request.method == 'POST':    
-        question_text = request.POST['question']
-        forum_id = request.POST['forum']
-        forum = get_object_or_404(Forum, pk=forum_id)
+        content_text = request.POST['content_text']
+        is_question = False
+        if 'is_question' in request.POST:
+            is_question = True
+        reply_to = None
+        if 'reply_to' in request.POST:
+            reply_to =  get_object_or_404(Post, pk=int(request.POST['reply_to']))
+        lessonCategory = get_object_or_404(LessonCategory, pk=lesson_category_id)
         if(request.user.is_authenticated):
-            q = Question.objects.create(question_text=question_text, author= request.user, forum= forum )
-            q.save()
+            p = Post.objects.create(content_text=content_text, author= request.user, lesson_category= lessonCategory, 
+                is_question=is_question, replying_to=reply_to )
+            p.save()
 
         if('next' in request.POST or 'next' in request.GET):
             next_page = request.POST.get('next', request.GET.get('next'))
@@ -66,12 +62,16 @@ def ask(request):
             next_page = request.path     
         return HttpResponseRedirect(next_page)
     else: 
-        return render(request, 'support/index.html', {'all_grades': Grades.objects.all(), 'all_topics': Topics.objects.all()})
+        all_grades_groups = GradeGroup.objects.all()
+        all_users = User.objects.annotate(Count('post')).filter(Q(post__count__gt=0))
+        all_users = sorted(all_users, key=lambda user: user_votes(user), reverse=True)
+        context = {'all_grades_groups': all_grades_groups, 'all_users': all_users}
+        return render(request, 'support/index.html', context)
 
-def up_vote_question(request, question_id):
+def up_vote(request, post_id):
     if(request.user.is_authenticated):
-        question = get_object_or_404(Question, pk=question_id)
-        question.set_vote(request.user, 1)
+        post = get_object_or_404(Post, pk=post_id)
+        post.set_vote(request.user, 1)
 
         if('next' in request.POST or 'next' in request.GET):
             next_page = request.POST.get('next', request.GET.get('next'))
@@ -81,12 +81,12 @@ def up_vote_question(request, question_id):
         if next_page:
             return HttpResponseRedirect(next_page)
         
-        return render(request, 'support/lesson.html', {'lesson': question.get_lesson()})
+        return render(request, 'support/lesson.html', {'lesson': post.lesson_category.lesson})
 
-def down_vote_question(request, question_id):
+def down_vote(request, post_id):
     if(request.user.is_authenticated):
-        question = get_object_or_404(Question, pk=question_id)
-        question.set_vote(request.user, -1)
+        post = get_object_or_404(Post, pk=post_id)
+        post.set_vote(request.user, -1)
 
         if('next' in request.POST or 'next' in request.GET):
             next_page = request.POST.get('next', request.GET.get('next'))
@@ -96,89 +96,13 @@ def down_vote_question(request, question_id):
         if next_page:
             return HttpResponseRedirect(next_page)
         
-        return render(request, 'support/lesson.html', {'lesson': question.get_lesson()})
+        return render(request, 'support/lesson.html', {'lesson': post.lesson_category.lesson})
 
-def edit_question(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    if request.user.is_authenticated and request.user.id == question.author.id:
-        question.question_text = request.POST['question']
-        question.save()
-
-        if('next' in request.POST or 'next' in request.GET):
-            next_page = request.POST.get('next', request.GET.get('next'))
-            # Security check -- don't allow redirection to a different host.
-            if not is_safe_url(url=next_page, host=request.get_host()):
-                next_page = request.path
-        if next_page:
-            return HttpResponseRedirect(next_page)
-
-
-def flag_question(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    question.status = 'F'
-    question.save();
-
-    if('next' in request.POST or 'next' in request.GET):
-        next_page = request.POST.get('next', request.GET.get('next'))
-        # Security check -- don't allow redirection to a different host.
-        if not is_safe_url(url=next_page, host=request.get_host()):
-            next_page = request.path
-    if next_page:
-        return HttpResponseRedirect(next_page)    
-
-def answer(request):
-    if request.method == 'POST':    
-        question = get_object_or_404(Question, pk=request.POST['question'])
-        answer_text = request.POST['answer']
-        if(request.user.is_authenticated):
-            a = question.answer_set.create(answer_text= answer_text, author= request.user )
-            a.save()
-
-        if('next' in request.POST or 'next' in request.GET):
-            next_page = request.POST.get('next', request.GET.get('next'))
-            # Security check -- don't allow redirection to a different host.
-            if not is_safe_url(url=next_page, host=request.get_host()):
-                next_page = request.path
-        else: 
-            next_page = request.path     
-        return HttpResponseRedirect(next_page)
-    else: 
-        return render(request, 'support/index.html', {'all_grades': Grades.objects.all(), 'all_topics': Topics.objects.all()})
-
-def up_vote_answer(request, answer_id):
-    if(request.user.is_authenticated):
-        answer = get_object_or_404(Answer, pk=answer_id)
-        answer.set_vote(request.user, 1)
-
-        if('next' in request.POST or 'next' in request.GET):
-            next_page = request.POST.get('next', request.GET.get('next'))
-            # Security check -- don't allow redirection to a different host.
-            if not is_safe_url(url=next_page, host=request.get_host()):
-                next_page = request.path
-        if next_page:
-            return HttpResponseRedirect(next_page)
-        return render(request, 'support/lesson.html', {'lesson': answer.question.get_lesson()})
-
-def down_vote_answer(request, answer_id):
-    if(request.user.is_authenticated):
-        answer = get_object_or_404(Answer, pk=answer_id)
-        answer.set_vote(request.user, -1)
-        if('next' in request.POST or 'next' in request.GET):
-            next_page = request.POST.get('next', request.GET.get('next'))
-            # Security check -- don't allow redirection to a different host.
-            if not is_safe_url(url=next_page, host=request.get_host()):
-                next_page = request.path
-        if next_page:
-            return HttpResponseRedirect(next_page)    
-        
-        return render(request, 'support/lesson.html', {'lesson': answer.question.get_lesson()})
-
-
-def edit_answer(request, answer_id):
-    answer = get_object_or_404(Answer, pk=answer_id )
-    if request.user.is_authenticated and request.user.id == answer.author.id:
-        answer.answer_text = request.POST['answer']
-        answer.save()
+def edit_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    if request.user.is_authenticated and request.user.id == post.author.id:
+        post.content_text = request.POST['content_text']
+        post.save()
 
         if('next' in request.POST or 'next' in request.GET):
             next_page = request.POST.get('next', request.GET.get('next'))
@@ -188,10 +112,11 @@ def edit_answer(request, answer_id):
         if next_page:
             return HttpResponseRedirect(next_page)
 
-def flag_answer(request, answer_id):
-    answer = get_object_or_404(Answer, pk=answer_id)
-    answer.status = 'F'
-    answer.save();
+
+def flag_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    post.status = 'F'
+    post.save();
 
     if('next' in request.POST or 'next' in request.GET):
         next_page = request.POST.get('next', request.GET.get('next'))

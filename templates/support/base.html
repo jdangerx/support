@@ -10,7 +10,7 @@
 
 <body>
     <header>
-        <a href="">order</a>
+        <a href="{% url 'order:index' %}">order</a>
         <a href="">homework</a>
         <a href="{% url 'support:index' %}">support</a>
         <form action="{% url 'support:haystack_search' %}?models=support.answer&models=support.lesson&models=support.question" method="get">
@@ -20,15 +20,46 @@
             <input type="hidden" name="models" value="support.lesson">
         </form>
         <h1>Heritage Chinese Center Teacher Support</h1>
+    </header>
+    <aside>
         <span id="user">
         {% if user.is_authenticated %}
             Hello, {{user.username}} <a href="{% url 'support:logout' %}?next={% url 'support:index' %}">Log out</a>
         {% else %}
-            <a href="{% url 'support:login' %}">Log in</a> or
-            <a href="{% url 'support:sign_up' %}">Sign up</a>
+
+            {% if form.errors %}
+            {{ form.non_field_errors }}
+
+            {% endif %}
+
+            <form method="post" action="{% url 'support:login' %}">
+            {% csrf_token %}
+            <label for="id_username">Username:</label><input id="id_username" maxlength="254" name="username" type="text">
+            <label for="id_password">Password:</label><input id="id_password" name="password" type="password">
+
+            <input type="submit" value="login" />
+            {% if next %}
+            <input type="hidden" name="next" value="{{next}}" />
+            {% else %}
+            <input type="hidden" name="next" value="{% url 'support:index' %}"/>
+            {% endif %}
+            </form> or <a href="{% url 'support:sign_up' %}">Sign up</a>
         {% endif%}
         </span>
-    </header>
+        <div><h3>WeChat Summary</h3>
+            <p>TODO</p>
+        </div>
+        <div><h3>Recent Questions</h3>
+            <div>
+                TODO
+            </div>
+        </div>
+        <div><h3>Hotest Posts</h3>
+            <div>
+                TODO
+            </div>
+        </div>
+    </aside>
     <main>
 	   {% block content %}{% endblock %}
     </main>

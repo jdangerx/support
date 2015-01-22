@@ -1,15 +1,5 @@
-ul {
-    padding-left:0px;
-}
-ul ul, ul.lessons ul ul{
-    padding-left:13%;
-}
-ul.lessons ul{
-    padding-left:0%;
-}
-ul li {
+section {
     display:block;
-    list-style-type: none;
     background-color: #fafdfe;
     clear:left;
     padding:1%;
@@ -18,38 +8,49 @@ ul li {
     box-shadow: 0 3px 10px -5px #99dced;
 }
 ul li div.vote {
-    width:13%;
+    width:4%;
     float:left;
     margin-left:0;
+    text-align: center;
+    line-height: .9em;
 }
-ul li div {
-    margin-left:13%;
+ul li div.post {
+    margin-left:4%;
+    padding:10px 0;
 }
 ul li div.vote a{
     display:block;
     text-decoration: none;
+    font-size:.7em;
 }
 ul li div span{
     font-size: 1em;
 }
-ul li ul li {
+
+ul {
+    list-style-type: none;
+    padding:0;
+    zoom:1; /* For IE 6/7 */
+}
+ul li {
     background-color:#fff;
+    padding:0 1% 0 0;
+    border: 1px solid #def4fa;
+    clear:left;
+    margin:3px 0;
+    border-radius:4px;
+    box-shadow: 0 3px 10px -5px #99dced;
 }
 
-ul li span.author {
-    color:#333;
-    font-style: italic;
+ul li a.author {
+    display:inline;
 }
-ul li div p:first-child {
+
+ul li div p:first-of-type {
     margin-top:0;
+    display:inline;
 }
-ul li div ul li {
-    list-style-type: circle;
-    background:transparent;
-    display: list-item;
-    box-shadow: none;
 
-}
 #id_models {
     float:left;
     width:70%;

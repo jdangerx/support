@@ -16,24 +16,15 @@ ul:after {
 
 ul li {
     display: block;
-    float:left;
     margin: 1% 0 1% 1.6%;
-    width: 32.1%;
-
 }
-
-ul li:nth-child(3n+1) {
-    margin-left:0;
-}
-ul li ul li, ul li ul li:first-child {
-    float:none;
-    width:100%;
-    margin: 0 0 10px 0;
+ul li  table {
+    width:90%;
 }
 li a {
     display:block;
     background-color: #fafdfe;
-    padding:5%;
+    padding:5px 5%;
     border-radius: .5em;
     box-shadow: 0 3px 10px -5px #99dced;
 }

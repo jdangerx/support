@@ -1,21 +1,23 @@
 body {
-    font: 15px Helvetica, Arial, sans-serif;
+    font: 15px;
     margin:0px;
 
     background-color: #def4fa;
 }
 header {
-    background-color: #05a9d3;
+    /*background-color: #05a9d3;*/
     position: relative;
 }
 header>a{
     display:block;
     float:left;
-    padding: 0.5% 1%;
+    padding: 3px 1%;
     margin:0 1%;
     border-bottom-right-radius: 10px;
     border-bottom-left-radius: 10px;
-    width:12%;
+    width:6%;
+    min-width: 64px;
+    font-size: .8em;
     background-color: #fafdfe;
     text-align: center;
 
@@ -32,19 +34,32 @@ a:visited{
     color:#0969BF;
 }
 main {
-    width:90%;
+    width:65%;
     max-width: 850px;
-    margin:5px auto;
+    margin:5px 0 5px 5%;
     text-align: left;
+    float:left;
 }
+aside {
+    width:25%;
+    float:right;
+    margin-right:3%;
+    margin-left:2%;
+}
+aside label {
+    min-width: 65px;
+}
+aside input[type=submit] {
+    width:auto;
+}
+
 header h1{
     text-align: center;
     clear:both;
-    padding:10px 1% 20px 1%;
-    font-size: 1.7em;
-    color:#fff;
+    padding-bottom:20px;
+    font-size: 1.5em;
     background:transparent;
-    margin-bottom: 0px;
+    margin: 0px;
 }
 h1, h2, h3 {
     margin:.5em 0;
@@ -75,7 +90,7 @@ label {
     width:21.5%;
     margin:2%;
     text-align: right;
-    min-width: 96px;
+    clear:left;
 }
 
 input[type=text],input[type=password],input[type=email],input[type=search] {
@@ -89,6 +104,12 @@ input[type=text],input[type=password],input[type=email],input[type=search] {
     border-color:#ccc;
 }
 
+input[type=checkbox] {
+    display: block;
+    float:left;
+    padding:1% 5px;
+    margin:1%;
+}
 select {
     display:block;
     float:left;

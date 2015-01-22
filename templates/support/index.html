@@ -1,27 +1,19 @@
-{% extends "base.html" %}
+{% extends "support/base.html" %}
 {% load staticfiles %}
 {% block style %}
 <link rel="stylesheet" type="text/css" href="{% static 'support/css/grade.css' %}">
 {% endblock %}
 {% block content %}
 
-<h2>Grades</h2>
-{% if all_grades %}
+{% if all_grades_groups %}
     <ul>
-    {% for grade in all_grades %}
-        <li><a href="{% url 'support:grade' grade.id %}">{{ grade.name }}</a></li>
+    {% for grade_group in all_grades_groups %}
+        <li><a href="{% url 'support:grade_group' grade_group.id %}">{{ grade_group.name }}</a>{{grade_group.intro_text}}</li>
     {% endfor %}
     </ul>
 {% endif %}
 
-<h2>Topics</h2>
-{% if all_topics %}
-    <ul>
-    {% for topic in all_topics %}
-        <li><a href="{% url 'support:topic' topic.id %}">{{ topic.name }}</a></li>
-    {% endfor %}
-    </ul>
-{% endif %}
+
 
 <h2>Top contributers</h2>
 {% if all_users %}

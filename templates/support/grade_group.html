@@ -1,0 +1,33 @@
+{% extends "support/base.html" %}
+{% load staticfiles %}
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{% static 'support/css/grade.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<h1>{{grade_group.name}}</h1>
+{{grade_group.intro_text}}
+
+TODO: **videos go here**
+<ul>{% for grade in grade_group.grade_set.all %}
+    <li><h2>{{grade.name}}</h2>
+        {{grade.intro_html|safe}}
+        <ul>{% for unit in grade.unit_set.all %}
+        	<li><h3>{{unit.name}}</h3> 
+        		<table>
+                    <tr><td></td><th>第一周</th><th>第二周</th><th>第三周</th><th>第四周</th><th>第五周</th><th>第六周</th><th>第七周</th><th>第八周</th></tr>
+                    <tr><td>Lesson</td>
+        		{% for lesson in unit.lesson_set.all %}
+        			<td colspan="{{lesson.week_length}}"><a href="{% url 'support:lesson' lesson.id %}"> {{lesson.name}}</a></td>
+        		{% endfor %}
+        		    </tr>
+                </table>
+        	</li>
+        	{% endfor %}
+        </ul>
+    </li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

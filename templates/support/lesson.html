@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "support/base.html" %}
 {% load staticfiles %}
 {% block style %}
 <link rel="stylesheet" type="text/css" href="{% static 'support/css/forum.css' %}">
@@ -8,13 +8,31 @@
 <script src="{% static 'support/js/forum.js' %}"></script>
 {% endblock %}
 {% block content %}
-
+<section>
 <h1>{{lesson.name}}</h1>
 {{lesson.intro_html|safe}}
-{% for lessonTopic in lesson.lessontopic_set.all %}
-{{lessonTopic.intro_html|safe}}
+</section>
+
+{% for lesson_category in lesson.lessoncategory_set.all %}
+<section><h2>{{lesson_category.category_type.name}}</h2>
+        <ul>
+        {% for post in lesson_category.sorted_posts %}
+            {% include "support/post.html" with post=post %}
+        {% endfor %}
+        </ul>
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'support:create_post' lesson_category.id%}?next={% url 'support:lesson' lesson.id %}">
+        {% csrf_token %}
+            <label>Your post:</label>
+                <textarea name="content_text"></textarea>
+                <label>Is this a question?</label>
+                <input type="checkbox" value="is_question"/>
+                <input type="submit" value="submit"/>
+        </form>
+        {% endif %}
+ </section>
 {% endfor %}
 
-{% include "support/forum.html" with page='support:lesson' object=lesson  questions=lesson.sorted_questions %}
 
+<div class="hidden" id="flag_alert">Are you sure you want to flag this? <a href="" class="yes">Yes</a> <a href="" class="no">No</a></div>
 {% endblock %}

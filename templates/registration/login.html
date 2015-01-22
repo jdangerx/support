@@ -1,9 +1,10 @@
-{% extends "base.html" %}
+{% extends "support/base.html" %}
 
 {% block content %}
 
 {% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
+{{ form.non_field_errors }}
+
 {% endif %}
 
 <form method="post" action="{% url 'support:login' %}">
