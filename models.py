@@ -74,7 +74,7 @@ class Grade(models.Model):
     name = models.CharField(max_length=200)
     intro_text = models.TextField()
     order = models.IntegerField(default=0)
-    grade_group = models.ForeignKey(GradeGroup)
+    grade_group = models.ForeignKey(GradeGroup, blank=True, null=True)
     class Meta:
         ordering = ["order"]
 
