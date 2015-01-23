@@ -19,7 +19,14 @@ ul li {
     margin: 1% 0 1% 1.6%;
 }
 ul li  table {
-    width:90%;
+    width: 100%;
+}
+ul li table th {
+    width:12.5%;
+    text-align:center;
+}
+ul li table td{
+    text-align:center;
 }
 li a {
     display:block;

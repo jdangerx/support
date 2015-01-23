@@ -13,10 +13,9 @@
         <a href="{% url 'order:index' %}">order</a>
         <a href="">homework</a>
         <a href="{% url 'support:index' %}">support</a>
-        <form action="{% url 'support:haystack_search' %}?models=support.answer&models=support.lesson&models=support.question" method="get">
+        <form action="{% url 'support:haystack_search' %}?models=support.post&models=support.lesson" method="get">
             <input type="search" name="q" placeholder="search">
-            <input type="hidden" name="models" value="support.answer">
-            <input type="hidden" name="models" value="support.question">
+            <input type="hidden" name="models" value="support.post">
             <input type="hidden" name="models" value="support.lesson">
         </form>
         <h1>Heritage Chinese Center Teacher Support</h1>
@@ -47,16 +46,24 @@
         {% endif%}
         </span>
         <div><h3>WeChat Summary</h3>
-            <p>TODO</p>
+            <div>
+                {% for summary in wechat_summaries %}
+                <p>{{summary}}</p>
+                {% endfor %}
+            </div>  
         </div>
         <div><h3>Recent Questions</h3>
             <div>
-                TODO
+                {% for question in recent_questions %}
+                    <p>{{question.content_text}} [{{question.vote_count}}][<a href="{% url 'support:lesson' question.lesson_category.lesson.id%}#post_{{question.id}}">reply</a>]</p>
+                {% endfor %}
             </div>
         </div>
-        <div><h3>Hotest Posts</h3>
+        <div><h3>Hottest Posts</h3>
             <div>
-                TODO
+                {% for post in hottest_posts %}
+                    <p>{{post.content_text}} [{{post.vote_count}}][<a href="{% url 'support:lesson' post.lesson_category.lesson.id%}#post_{{post.id}}">reply</a>]</p>
+                {% endfor %}
             </div>
         </div>
     </aside>

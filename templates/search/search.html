@@ -19,12 +19,9 @@
                 {% if result.content_type == "support.lesson" %}
                     <a href="{{ result.object.get_absolute_url }}">{{ result.object.name }}</a>
                     {{result.object.intro_html|safe}}
-                {% elif result.content_type == "support.question" %}
-                    <a href="{{ result.object.get_absolute_url }}">question by {{ result.object.author.username }}</a>
-                    {{result.object.question_html|safe}}
-                {% elif result.content_type == "support.answer" %}
-                    <a href="{{ result.object.get_absolute_url }}">answer by {{ result.object.author.username}}</a>
-                    {{result.object.answer_html|safe}}
+                {% elif result.content_type == "support.post" %}
+                    <a href="{{ result.object.get_absolute_url }}">post by {{ result.object.author.username }}</a>
+                    {{result.object.content_html|safe}}
                 {% endif %}
                 </li>
             {% empty %}

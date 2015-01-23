@@ -149,8 +149,7 @@ class Post(Votable):
     lesson_category = models.ForeignKey(LessonCategory)
     replying_to = models.ForeignKey('self',blank=True, null=True, related_name='replies')
     is_question = models.BooleanField(default=False)
-    date_time = models.DateTimeField(default=datetime.now)
-
+    published = models.DateTimeField(default=datetime.now)
 
     def content_html(self):
         if self.author.groups.filter(name='Moderators').exists() or self.author.groups.filter(name='Contributors').exists():
@@ -203,5 +202,13 @@ class UserProfile(models.Model):
     def is_contributor(self):
         return self.user.groups.filter(name='Contributors').exists()
 
-
+class WechatSummary(models.Model):
+    text = models.TextField()
+    published = models.DateTimeField()
+    
+    def content_html(self):
+        return markdown.markdown(bleach.clean(self.content_text))
+        
+    def __unicode__(self):
+        return self.text
 

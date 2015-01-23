@@ -1,5 +1,5 @@
 from django.contrib import admin
-from support.models import Grade, GradeGroup, Unit, Lesson, SupplementalMaterial, Vote, LessonCategory, LessonCategoryType, UserProfile, Post
+from support.models import Grade, GradeGroup, Unit, Lesson, SupplementalMaterial, Vote, LessonCategory, LessonCategoryType, UserProfile, Post, WechatSummary
 from django.contrib.auth.models import User
 
 class PostAdmin(admin.ModelAdmin):
@@ -9,6 +9,7 @@ admin.site.register(Post, PostAdmin)
 admin.site.register(Vote)
 admin.site.register(UserProfile)
 admin.site.register(LessonCategoryType)
+admin.site.register(WechatSummary)
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'order')

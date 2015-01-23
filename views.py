@@ -42,6 +42,7 @@ def create_post(request, lesson_category_id):
     if request.method == 'POST':    
         content_text = request.POST['content_text']
         is_question = False
+        print(request.POST)
         if 'is_question' in request.POST:
             is_question = True
         reply_to = None

@@ -16,8 +16,8 @@ TODO: **videos go here**
         <ul>{% for unit in grade.unit_set.all %}
         	<li><h3>{{unit.name}}</h3> 
         		<table>
-                    <tr><td></td><th>第一周</th><th>第二周</th><th>第三周</th><th>第四周</th><th>第五周</th><th>第六周</th><th>第七周</th><th>第八周</th></tr>
-                    <tr><td>Lesson</td>
+                    <tr><th>第一周</th><th>第二周</th><th>第三周</th><th>第四周</th><th>第五周</th><th>第六周</th><th>第七周</th><th>第八周</th></tr>
+                    <tr>
         		{% for lesson in unit.lesson_set.all %}
         			<td colspan="{{lesson.week_length}}"><a href="{% url 'support:lesson' lesson.id %}"> {{lesson.name}}</a></td>
         		{% endfor %}
