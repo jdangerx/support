@@ -18,9 +18,9 @@ class Migration(SchemaMigration):
         db.send_create_signal(u'support', ['GradeGroup'])
 
         # Adding field 'Grade.grade_group'
-        #db.add_column(u'support_grade', 'grade_group',
-        #              self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['support.GradeGroup']),
-        #              keep_default=False)
+        db.add_column(u'support_grade', 'grade_group',
+                      self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['support.GradeGroup']),
+                      keep_default=False)
 
 
     def backwards(self, orm):
