@@ -1,0 +1,17 @@
+[
+    {
+        "model": "support.grade_group",
+        "pk": 1,
+        "fields": { "name" : "Elementary"}
+    },
+   {
+        "model": "support.grade_group",
+        "pk": 2,
+        "fields": { "name" : "Middle"}
+    },
+    {
+        "model": "support.grade_group",
+        "pk": 3,
+        "fields": { "name" : "High"}
+    }
+]
