@@ -3,7 +3,8 @@ from django.conf.urls import patterns, url, include
 from support import views
 from django.contrib.auth.views import login, logout
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(r'^$', views.index, name='index'),
     url(r'^school/(?P<grade_group_id>\d+)/$', views.grade_group, name='grade_group'),
     url(r'^lesson/(?P<lesson_id>\d+)/$', views.lesson, name='lesson'),
